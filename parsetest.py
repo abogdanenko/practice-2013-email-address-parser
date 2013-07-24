@@ -42,6 +42,7 @@ class ParseBadText(unittest.TestCase):
 
         yield 'jsmith@xy', 2
         yield 'jsmith@' + 'x' * 256, 2
+        yield 'extra@at@sign.com', 2
         yield 'jsmith@space space.com', 2
         yield 'jsmith@plus+plus.com', 2
         yield 'jsmith@back\\slash.com', 2

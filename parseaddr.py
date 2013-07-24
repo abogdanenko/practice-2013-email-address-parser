@@ -2,6 +2,8 @@
 # Contact: alexey@bogdanenko.com
 # works with python 3.2 and older
 
+import re
+
 """Email address parser"""
 
 def parse_email_addr(text):
@@ -27,4 +29,28 @@ def parse_email_addr(text):
     
     if not isinstance(text, str):
         raise TypeError('expecting a string')
-    pass
+
+    # extract local and domain parts
+    local_part, sep, domain_part = text.partition('@')
+    if not local_part or not domain_part
+        return 1
+
+    # parse domain part
+    if not 3 <= len(domain_part) <= 256:
+        return 2
+    subdomain_regex = re.compile('[a-z0-9_-]+')
+    for subdomain in domain_part.split('.'):
+        if not subdomain_regex.match(subdomain):
+            return 2
+        if subdomain.startswith('-') or subdomain.endswith('-'):
+            return 3
+
+    # parse local part
+    if len(local_part) > 128:
+        return 4
+
+    if '..' in local_part:
+        return 5
+    
+    return 0
+            
