@@ -15,9 +15,9 @@ def parse_email_addr(text):
     Returns:
         If text represents a valid email address, returns 0, otherwise, returns
         number of the first rule text doesn't comply with. For example:
-        >>> parse_email('jsmith@example.com')
+        >>> parse_email_addr('jsmith@example.com')
         0
-        >>> parse_email('double..dots@example.com')
+        >>> parse_email_addr('double..dots@example.com')
         5
 
     Raises:

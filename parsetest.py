@@ -19,6 +19,17 @@ class ParseBadInput(unittest.TestCase):
 class ParseBadText(unittest.TestCase):
 
     def generate_bad_text(self):
+        """ Generates invalid email addresses
+
+        text is considered a valid email address if and only if it complies with
+        The Rules given in the problem description (ommitted here for brevity).
+ 
+        Yields:
+            Finite number of tuples (text, rule_number). text is a string that
+            may or may not look like an email address, in any case, it is not a
+            valid email address; rule_number is number of the first Rule text
+            doesn't comply with.
+        """
         cyrillic_letter_a = chr(0x0430) 
 
         yield '', 1
@@ -55,6 +66,7 @@ class ParseBadText(unittest.TestCase):
         yield '"@example.com', 6
         yield '"missing"quote"@example.com', 6
         yield '"""@example.com', 6
+
         yield 'exclamation!point@example.com', 7
         yield 'comma,comma@example.com', 7
 
@@ -75,43 +87,49 @@ class ParseBadText(unittest.TestCase):
 class ParseValidEmailAddr(unittest.TestCase):
 
     def generate_valid_email_addr(self):
-        yield 'jsmith@example.com', 0
-        yield 'john.smith@example.com', 0
-        yield 'john.w.smith@example.com', 0
+        """ Generates valid email addresses
 
-        yield 'admin@mailserver', 0  # local domain name with no TLD
-        yield 'jsmith@xyz', 0
-        yield 'jsmith@' + 'x' * 255, 0
-        yield 'jsmith@___.com', 0
-        yield 'jsmith@3.14.com', 0
-        yield 'jsmith@17-4-5', 0
-        yield 'jsmith@big-company.com', 0
-        yield 'jsmith@big.company.com', 0
-        yield 'jsmith@big-company.com', 0
+        Yields:
+            Finite number of strings which represent valid email addresses 
+        """
 
-        yield 'x' * 128 + '@example.com', 0
-        yield '.@example.com', 0
-        yield '_@example.com', 0
-        yield '-@example.com', 0
-        yield '7@example.com', 0
-        yield '.dots.@example.com', 0
-        yield '__under__scores__dots.dots.dash--dash--@example.com', 0
+        yield 'jsmith@example.com'
+        yield 'john.smith@example.com'
+        yield 'john.w.smith@example.com'
 
-        yield '""@example.com', 0
-        yield '"double"quotes@example.com', 0
-        yield '""""@example.com', 0
-        yield '"double"_"quotes"@example.com', 0
-        yield '"!"double","quotes"comma,colon:"@example.com', 0
-        yield '","@example.com', 0
+        yield 'admin@mailserver'  # local domain name with no TLD
+        yield 'jsmith@xyz'
+        yield 'jsmith@' + 'x' * 255
+        yield 'jsmith@___.com'
+        yield 'jsmith@3.14.com'
+        yield 'jsmith@17-4-5'
+        yield 'jsmith@big-company.com'
+        yield 'jsmith@big.company.com'
+        yield 'jsmith@big-company.com'
+
+        yield 'x' * 128 + '@example.com'
+        yield '.@example.com'
+        yield '_@example.com'
+        yield '-@example.com'
+        yield '7@example.com'
+        yield '.dots.@example.com'
+        yield '__under__scores__dots.dots.dash--dash--@example.com'
+
+        yield '""@example.com'
+        yield '"double"quotes@example.com'
+        yield '""""@example.com'
+        yield '"double"_"quotes"@example.com'
+        yield '"!"double","quotes"comma,colon:"@example.com'
+        yield '","@example.com'
 
     def test_valid_email_addr(self):
         """Test with a valid email address."""
-        for text, err_code in self.generate_valid_email_addr():
+        for text in self.generate_valid_email_addr():
             returned_value = parse_email_addr(text) 
             self.assertIs(returned_value, int)
             msg = ('text <{}> should have been classified as a valid email'
                 ' address').format(text)
-            self.assertEqual(returned_value, err_code, msg)
+            self.assertEqual(returned_value, 0, msg)
 
 if __name__ == '__main__':
     unittest.main()
