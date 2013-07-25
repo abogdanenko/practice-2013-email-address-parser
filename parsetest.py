@@ -10,6 +10,7 @@ import unittest
 from parseaddr import parse_email_addr
 
 class ParseValidEmailAddr(unittest.TestCase):
+    """Test parse_email_addr function with valid email addresses."""
 
     def valid_email_addr_generator(self):
         """ Generates valid email addresses
@@ -53,7 +54,7 @@ class ParseValidEmailAddr(unittest.TestCase):
         yield '","@example.com'
 
     def test_valid_email_addr(self):
-        """Test with a valid email address.
+        """Test with valid email addresses.
         
         Pass valid addresses to parse_email_addr function and check that
         it returns 0.
@@ -66,9 +67,10 @@ class ParseValidEmailAddr(unittest.TestCase):
             self.assertEqual(returned_value, 0, msg)
 
 class ParseBadInput(unittest.TestCase):
+    """Test parse_email_addr function with non-string objects."""
 
     def test_bad_input(self):
-        """Test with a non-string object.
+        """Test with non-string objects.
 
         Check that parse_email_addr function raises TypeError.
         """
@@ -76,6 +78,7 @@ class ParseBadInput(unittest.TestCase):
             self.assertRaises(TypeError, parse_email_addr, obj)
 
 class ParseBadText(unittest.TestCase):
+    """Test parse_email_addr function with bad input strings."""
 
     def bad_text_generator(self):
         """ Generates invalid email addresses
@@ -137,7 +140,7 @@ class ParseBadText(unittest.TestCase):
         yield 'comma,comma@example.com', 7
 
     def test_bad_text(self):
-        """Test with a bad input string.
+        """Test with a bad input strings.
 
         Check that parse_email_addr function returns correct error code.
         """
@@ -145,10 +148,10 @@ class ParseBadText(unittest.TestCase):
             returned_value = parse_email_addr(text) 
             self.assertIsInstance(returned_value, int)
             if returned_value:
-               msg = 'wrong rule number returned for bad text <{}>'
+                msg = 'wrong rule number returned for bad text <{}>'
             else:
-               msg = ('text <{}> was incorrectly classified as a valid email'
-                   ' address')
+                msg = ('text <{}> was incorrectly classified as a valid email'
+                    ' address')
             msg = msg.format(text)
 
             self.assertEqual(returned_value, err_code, msg)

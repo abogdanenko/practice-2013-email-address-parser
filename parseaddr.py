@@ -2,9 +2,9 @@
 # Contact: alexey@bogdanenko.com
 # works with python 3.2 and older
 
-import re
-
 """Email address parser"""
+
+import re
 
 def parse_email_addr(text):
     """Check if text represents a valid email address.
@@ -32,7 +32,7 @@ def parse_email_addr(text):
         raise TypeError('expecting a string')
 
     # extract local and domain parts
-    local_part, sep, domain_part = text.partition('@')
+    local_part, domain_part = text.partition('@')[::2]  # elems number 0 and 2
     if not local_part or not domain_part:
         # either local part or domain part is missing
         return 1   
@@ -55,25 +55,24 @@ def parse_email_addr(text):
         # consecutive dots in local part are not allowed
         return 5
 
-    """
-    Check if Rules 4, 6, 7 are satisfied
-    Algorithm:
-        Split (without overlaps) local_part so that resulting list looks like
-        this: 
+    # Check if Rules 4, 6, 7 are satisfied using the following algorithm.
+    #
+    # 1. Split (without overlaps) local_part so that resulting list looks like
+    # this: 
+    #
+    #     [N, Q, N, ..., Q, N],
+    #
+    # where Q represents string two or more characters long that starts and
+    # ends with double quotes (i.e. matches quoted_regex) and N contains less
+    # than two quotation marks.
+    #
+    # 2. Then split the list into two lists with even and odd elements:
+    #
+    #     [N, N, ..., N]
+    #     [Q, ..., Q]
+    #
+    # 3. Check for illegal characters inside strings of each list.
 
-            [N, Q, N, ..., Q, N],
-
-        where Q represents string two or more characters long that starts and
-        ends with double quotes (i.e. matches quoted_regex) and N contains less
-        than two quotation marks.
-
-        Then split the list into two lists with even and odd elements:
-
-            [N, N, ..., N]
-            [Q, ..., Q]
-
-        and check for illegal characters inside strings of each list.
-    """
     if len(local_part) > 128:
         # local part is too long
         return 4
@@ -83,20 +82,20 @@ def parse_email_addr(text):
     outside_quotes_regex = re.compile('[a-z0-9._-]*\Z') 
     local_part_tokens = quoted_regex.split(local_part)    
 
-    for x in local_part_tokens[::2]:  # even elems
-        if '"' in x:
+    for token in local_part_tokens[::2]:  # slice with unquoted tokens
+        if '"' in token:
             # missing closing quote in local part
             return 6
-        if not inside_quotes_regex.match(x):
+        if not inside_quotes_regex.match(token):
             # illegal character in local part
             return 4
-        if not outside_quotes_regex.match(x):
+        if not outside_quotes_regex.match(token):
             # punctuation characters "!,:" must be inside quotes
             return 7
 
-    for x in local_part_tokens[1::2]:  # odd elems
-        x = x[1:-1]  # strip quotes
-        if not inside_quotes_regex.match(x):
+    for token in local_part_tokens[1::2]:  # slice with quoted tokens
+        token = token[1:-1]  # strip quotes
+        if not inside_quotes_regex.match(token):
             # illegal character in local part
             return 4
 
