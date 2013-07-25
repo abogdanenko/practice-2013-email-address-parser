@@ -41,15 +41,15 @@ class ParseBadText(unittest.TestCase):
         yield '@example.com', 1
 
         yield 'jsmith@xy', 2
-        yield 'jsmith@' + 'x' * 256, 2
+        yield 'jsmith@' + 'x' * 257, 2
         yield 'extra@at@sign.com', 2
         yield 'jsmith@space space.com', 2
         yield 'jsmith@plus+plus.com', 2
         yield 'jsmith@back\\slash.com', 2
         yield 'jsmith@double"quote.com', 2
         yield 'jsmith@example.com\n', 2
+        yield 'jsmith@capitalLetter.com', 2
         yield 'apetrov@y{}ndex.ru'.format(cyrillic_letter_a), 2
-        yield 'capitalLetter@example.com', 2
 
         yield 'jsmith@ends.with-.dash.com', 3
         yield 'jsmith@starts.with.-dash.com', 3
@@ -57,7 +57,7 @@ class ParseBadText(unittest.TestCase):
         yield 'x' * 129 + '@example.com', 4
         yield 'space space@example.com', 4
         yield '{}petrov@yandex.ru'.format(cyrillic_letter_a), 4
-        yield 'jsmith@capitalLetter.com', 4
+        yield 'capitalLetter@example.com', 4
 
         yield 'double..dots@example.com', 5
         yield 'triple...dots@example.com', 5
@@ -72,7 +72,7 @@ class ParseBadText(unittest.TestCase):
         yield 'comma,comma@example.com', 7
 
     def test_bad_text(self):
-        """Test with bad input string."""
+        """Test with a bad input string."""
         for text, err_code in self.generate_bad_text():
             returned_value = parse_email_addr(text) 
             self.assertIsInstance(returned_value, int)
@@ -100,7 +100,7 @@ class ParseValidEmailAddr(unittest.TestCase):
 
         yield 'admin@mailserver'  # local domain name with no TLD
         yield 'jsmith@xyz'
-        yield 'jsmith@' + 'x' * 255
+        yield 'jsmith@' + 'x' * 256
         yield 'jsmith@___.com'
         yield 'jsmith@3.14.com'
         yield 'jsmith@17-4-5'

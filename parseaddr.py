@@ -38,7 +38,7 @@ def parse_email_addr(text):
     # parse domain part
     if not 3 <= len(domain_part) <= 256:
         return 2
-    subdomain_regex = re.compile('[a-z0-9_-]+')
+    subdomain_regex = re.compile('[a-z0-9_-]+\Z')
     for subdomain in domain_part.split('.'):
         if not subdomain_regex.match(subdomain):
             return 2
@@ -72,8 +72,8 @@ def parse_email_addr(text):
         return 4
 
     double_quoted_regex = re.compile('(".*?")')  # non-greedy match
-    quoted_regex = re.compile('[!,:a-z0-9._-]*')
-    non_quoted_regex = re.compile('[a-z0-9._-]*') 
+    quoted_regex = re.compile('[!,:a-z0-9._-]*\Z')
+    non_quoted_regex = re.compile('[a-z0-9._-]*\Z') 
     lst = double_quoted_regex.split(local_part)    
 
     for x in lst[::2]:
