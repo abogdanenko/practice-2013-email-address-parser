@@ -75,7 +75,7 @@ class ParseBadText(unittest.TestCase):
         """Test with bad input string."""
         for text, err_code in self.generate_bad_text():
             returned_value = parse_email_addr(text) 
-            self.assertIs(returned_value, int)
+            self.assertIsInstance(returned_value, int)
             if returned_value:
                msg = 'wrong rule number returned for bad text <{}>'
             else:
@@ -117,7 +117,9 @@ class ParseValidEmailAddr(unittest.TestCase):
         yield '__under__scores__dots.dots.dash--dash--@example.com'
 
         yield '""@example.com'
+        yield '"quoted"@example.com'
         yield '"double"quotes@example.com'
+        yield 'double"quotes"@example.com'
         yield '""""@example.com'
         yield '"double"_"quotes"@example.com'
         yield '"!"double","quotes"comma,colon:"@example.com'
@@ -127,7 +129,7 @@ class ParseValidEmailAddr(unittest.TestCase):
         """Test with a valid email address."""
         for text in self.generate_valid_email_addr():
             returned_value = parse_email_addr(text) 
-            self.assertIs(returned_value, int)
+            self.assertIsInstance(returned_value, int)
             msg = ('text <{}> should have been classified as a valid email'
                 ' address').format(text)
             self.assertEqual(returned_value, 0, msg)
