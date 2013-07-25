@@ -8,6 +8,7 @@ import re
 
 def parse_email_addr(text):
     """Check if text represents a valid email address.
+
     text is considered a valid email address if and only if it complies with
     The Rules given in the problem description (ommitted here for brevity).
     
@@ -33,20 +34,25 @@ def parse_email_addr(text):
     # extract local and domain parts
     local_part, sep, domain_part = text.partition('@')
     if not local_part or not domain_part:
-        return 1
+        # either local part or domain part is missing
+        return 1   
 
     # parse domain part
     if not 3 <= len(domain_part) <= 256:
+        # domain part is too short or too long
         return 2
     subdomain_regex = re.compile('[a-z0-9_-]+\Z')
     for subdomain in domain_part.split('.'):
         if not subdomain_regex.match(subdomain):
+            # illegal character in domain part
             return 2
         if subdomain.startswith('-') or subdomain.endswith('-'):
+            # subdomain must not start with dash or end with dash
             return 3
 
     # parse local part
     if '..' in local_part:
+        # consecutive dots in local part are not allowed
         return 5
 
     """
@@ -58,36 +64,41 @@ def parse_email_addr(text):
             [N, Q, N, ..., Q, N],
 
         where Q represents string two or more characters long that starts and
-        ends with double quotes (i.e. matches double_quoted_regex) and N
-        contains less than two quotation marks
+        ends with double quotes (i.e. matches quoted_regex) and N contains less
+        than two quotation marks.
 
         Then split the list into two lists with even and odd elements:
 
             [N, N, ..., N]
             [Q, ..., Q]
 
-        and check for illegal characters inside strings of each list
+        and check for illegal characters inside strings of each list.
     """
     if len(local_part) > 128:
+        # local part is too long
         return 4
 
-    double_quoted_regex = re.compile('(".*?")')  # non-greedy match
-    quoted_regex = re.compile('[!,:a-z0-9._-]*\Z')
-    non_quoted_regex = re.compile('[a-z0-9._-]*\Z') 
-    lst = double_quoted_regex.split(local_part)    
+    quoted_regex = re.compile('(".*?")')  # non-greedy match
+    inside_quotes_regex = re.compile('[!,:a-z0-9._-]*\Z')
+    outside_quotes_regex = re.compile('[a-z0-9._-]*\Z') 
+    local_part_tokens = quoted_regex.split(local_part)    
 
-    for x in lst[::2]:
+    for x in local_part_tokens[::2]:  # even elems
         if '"' in x:
+            # missing closing quote in local part
             return 6
-        if not quoted_regex.match(x):
+        if not inside_quotes_regex.match(x):
+            # illegal character in local part
             return 4
-        if not non_quoted_regex.match(x):
+        if not outside_quotes_regex.match(x):
+            # punctuation characters "!,:" must be inside quotes
             return 7
 
-    for x in lst[1::2]:
-        x = x[1:-1] # strip quotes
-        if not quoted_regex.match(x):
+    for x in local_part_tokens[1::2]:  # odd elems
+        x = x[1:-1]  # strip quotes
+        if not inside_quotes_regex.match(x):
+            # illegal character in local part
             return 4
-    
+
+    # success, text represents a valid email address
     return 0
-            
